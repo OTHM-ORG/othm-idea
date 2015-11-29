@@ -47,9 +47,10 @@ void othm_idea_soup(struct othm_idea *context,
 		    struct othm_idea *(*gen)(void),
 		    void (*destroy)(struct othm_idea *));
 
-/* void othm_idea_print(struct othm_idea *idea); */
 void othm_idea_print_recursive(struct othm_idea *idea, int indent);
 
-void othm_idea_manifest(struct othm_idea *idea, struct othm_idea *host);
+void othm_idea_manifest(struct othm_idea *context,
+			struct othm_idea *host,
+			struct othm_idea *(*gen)(void));
 
 #endif

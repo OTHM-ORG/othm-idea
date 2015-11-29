@@ -28,6 +28,8 @@ int main(int argc, char **args)
 {
 	/* struct othm_idea *truth = othm_idea_new(NULL, OTHM_SYMBOL(true), */
 	/* 					OTHM_SYMBOL(abstract)); */
+	struct othm_idea *Death = othm_idea_new(NULL, OTHM_SYMBOL(Death),
+						NULL, NULL);
 
 	struct othm_idea *context = othm_idea_new(NULL, OTHM_SYMBOL(context),
 						  NULL, NULL);
@@ -61,14 +63,19 @@ int main(int argc, char **args)
 
 
 	othm_idea_soup(context, dreadium, NULL, NULL);
+	othm_idea_print_recursive(context, 0);
+
+	othm_idea_manifest(context, Death, NULL);
+	othm_idea_print_recursive(Death, 0);
 	/* othm_idea_print(Death); */
 	/* othm_idea_add(hood, OTHM_KEYWORD(color), black); */
 	/* othm_idea_add(Death, OTHM_KEYWORD(worn), hood); */
 	/* othm_idea_add(Death, OTHM_KEYWORD(held), scythe); */
 	/* othm_idea_add(Death, OTHM_KEYWORD(being), reaper); */
-	othm_idea_print_recursive(context, 0);
 	/* printf("Hello, world!"); */
 	othm_idea_free(context, NULL);
+	othm_idea_free(dreadium, NULL);
+	othm_idea_free(Death, NULL);
 	/* othm_idea_free(reaper, NULL); */
 	/* othm_idea_free(scythe, NULL); */
 	/* othm_idea_free(hood, NULL); */

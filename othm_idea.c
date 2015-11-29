@@ -207,54 +207,23 @@ void othm_idea_soup(struct othm_idea *context,
 }
 
 void othm_idea_manifest(struct othm_idea *context,
-			struct othm_idea *host)
+			struct othm_idea *host,
+			struct othm_idea *(*gen)(void))
 {
 	struct othm_idea *restrictium;
 
 	restrictium = othm_hashmap_get(context->fields,
 				       OTHMREQUEST
 				       (OTHM_KEYWORD(restrictium)));
+	OTHM_IDEA_FORALL
+		(restrictium,
+		 othm_idea_add(host, sub_idea->keyword,
+			       othm_idea_get_copy(context,
+						  sub_idea->keyword,
+						  gen)));
 
 }
 
-/* void othm_idea_print(struct othm_idea *idea) */
-/* { */
-/* 	struct othm_hashbin *current_hashbin; */
-/* 	unsigned int hashbin_num; */
-/* 	unsigned int i; */
-
-/* 	current_hashbin = idea->fields->hashbins; */
-/* 	hashbin_num = idea->fields->hashbin_num; */
-/* 	printf("[ "); */
-/* 	if (idea->symbol != NULL) */
-/* 		othm_symbol_print(idea->symbol); */
-/* 	else */
-/* 		printf("'{ ... }"); */
-/* 	printf(" ] {\n"); */
-/* 	for (i = 0; i != hashbin_num; ++i) { */
-/* 		struct othm_hashentry *current_hashentry; */
-
-/* 		current_hashentry = current_hashbin->first; */
-/* 		while (current_hashentry != NULL) { */
-/* 			struct othm_idea *sub_idea; */
-
-/* 			printf("  "); */
-/* 			sub_idea = current_hashentry->storage; */
-/* 			othm_symbol_print(sub_idea->keyword); */
-/* 			printf(" = "); */
-/* 			if (sub_idea->symbol != NULL) */
-/* 				othm_symbol_print(sub_idea->symbol); */
-/* 			else */
-/* 				printf("'{ ... }"); */
-/* 			printf("\n"); */
-
-/* 			current_hashentry = current_hashentry->next; */
-/* 		} */
-/* 		++current_hashbin; */
-/* 	} */
-
-/* 	printf("}\n"); */
-/* } */
 
 void othm_idea_print_recursive(struct othm_idea *idea, int indent)
 {
