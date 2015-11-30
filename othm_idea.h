@@ -8,14 +8,14 @@
 
 struct othm_idea {
 	struct othm_request self_request;
-	struct othm_symbol_struct *symbol;
+	struct othm_symbol_struct *name;
 	struct othm_hashmap *fields;
-	struct othm_symbol_struct *keyword;
+	struct othm_symbol_struct *relation;
 
 	struct othm_idea *context;
 };
 
-OTHM_KEYWORD_EXPORT(restrictium);
+OTHM_SYMBOL_EXPORT(restrictium);
 
 struct othm_idea *othm_idea_new(struct othm_idea *(*gen)(void),
 				struct othm_symbol_struct *symbol,
@@ -50,7 +50,9 @@ void othm_idea_soup(struct othm_idea *context,
 void othm_idea_print_recursive(struct othm_idea *idea, int indent);
 
 void othm_idea_manifest(struct othm_idea *context,
-			struct othm_idea *host,
 			struct othm_idea *(*gen)(void));
+
+void othm_idea_mixup(struct othm_idea *context);
+
 
 #endif

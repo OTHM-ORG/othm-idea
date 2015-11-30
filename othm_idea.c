@@ -4,7 +4,9 @@
 
 char othm_idea_key_type[] = "idea";
 
-OTHM_KEYWORD_INIT(restrictium);
+OTHM_SYMBOL_INIT(restrictium);
+
+#define OTHM_SEMICOLON_INDUCER do {} while(0)
 
 #define OTHM_IDEA_FORALL(IDEA, CODE)					\
 	{								\
@@ -33,8 +35,8 @@ OTHM_KEYWORD_INIT(restrictium);
 	}
 
 struct othm_idea *othm_idea_new(struct othm_idea *(*gen)(void),
-				struct othm_symbol_struct *symbol,
-				struct othm_symbol_struct *keyword,
+				struct othm_symbol_struct *name,
+				struct othm_symbol_struct *relation,
 				struct othm_idea *context)
 {
 	struct othm_idea *idea;
@@ -44,8 +46,8 @@ struct othm_idea *othm_idea_new(struct othm_idea *(*gen)(void),
 	else
 		idea = malloc(sizeof(struct othm_idea));
 
-	idea->symbol = symbol;
-	idea->keyword = keyword;
+	idea->name = name;
+	idea->relation = relation;
 	idea->context = context;
 
 	idea->self_request.data = idea;
@@ -56,9 +58,9 @@ struct othm_idea *othm_idea_new(struct othm_idea *(*gen)(void),
 	idea->fields = othm_hashmap_new(NULL);
 
 	if (context != NULL)
-		if (keyword != NULL)
+		if (relation != NULL)
 			othm_hashmap_add(context->fields,
-					 OTHMREQUEST(keyword),
+					 OTHMREQUEST(relation),
 					 idea);
 		else
 			othm_hashmap_add(context->fields,
@@ -69,23 +71,23 @@ struct othm_idea *othm_idea_new(struct othm_idea *(*gen)(void),
 }
 
 void othm_idea_add(struct othm_idea *idea,
-		   struct othm_symbol_struct *keyword,
+		   struct othm_symbol_struct *relation,
 		   struct othm_idea *sub_idea)
 {
 	if (sub_idea->context != NULL)
-		if (sub_idea->keyword != NULL)
+		if (sub_idea->relation != NULL)
 			othm_hashmap_remove(sub_idea->context->fields,
-				    OTHMREQUEST(sub_idea->keyword));
+				    OTHMREQUEST(sub_idea->relation));
 		else
 			othm_hashmap_remove(sub_idea->context->fields,
 					    OTHMREQUEST(sub_idea));
 
 	sub_idea->context = idea;
-	sub_idea->keyword = keyword;
+	sub_idea->relation = relation;
 
-	if (keyword != NULL)
+	if (relation != NULL)
 		othm_hashmap_add(idea->fields,
-				 OTHMREQUEST(keyword),
+				 OTHMREQUEST(relation),
 				 sub_idea);
 	else
 		othm_hashmap_add(idea->fields,
@@ -99,7 +101,7 @@ void othm_idea_merge_to(struct othm_idea *to_idea,
 {
 	OTHM_IDEA_FORALL
 		(from_idea,
-		 othm_idea_add(to_idea, sub_idea->keyword, sub_idea));
+		 othm_idea_add(to_idea, sub_idea->relation, sub_idea));
 
 	othm_hashmap_free(from_idea->fields, NULL);
 	if (destroy != NULL)
@@ -109,13 +111,13 @@ void othm_idea_merge_to(struct othm_idea *to_idea,
 }
 
 struct othm_idea *othm_idea_get(struct othm_idea *idea,
-				struct othm_symbol_struct *keyword)
+				struct othm_symbol_struct *relation)
 {
 	struct othm_idea *sub_idea;
 
-	sub_idea = othm_hashmap_get(idea->fields, OTHMREQUEST(keyword));
+	sub_idea = othm_hashmap_get(idea->fields, OTHMREQUEST(relation));
 	if (sub_idea != NULL) {
-		othm_hashmap_remove(idea->fields, OTHMREQUEST(keyword));
+		othm_hashmap_remove(idea->fields, OTHMREQUEST(relation));
 		sub_idea->context = NULL;
 	}
 	return sub_idea;
@@ -131,8 +133,8 @@ struct othm_idea *othm_idea_copy(struct othm_idea *old_idea,
 	else
 		idea = malloc(sizeof(struct othm_idea));
 
-	idea->symbol = old_idea->symbol;
-	idea->keyword = old_idea->keyword;
+	idea->name = old_idea->name;
+	idea->relation = old_idea->relation;
 	idea->fields = othm_hashmap_new(NULL);
 	idea->context = NULL;
 
@@ -143,18 +145,18 @@ struct othm_idea *othm_idea_copy(struct othm_idea *old_idea,
 
 	OTHM_IDEA_FORALL
 		(old_idea,
-		 othm_idea_add(idea, sub_idea->keyword,
+		 othm_idea_add(idea, sub_idea->relation,
 			       othm_idea_copy(sub_idea, gen)));
 	return idea;
 }
 
 struct othm_idea *othm_idea_get_copy(struct othm_idea *idea,
-				     struct othm_symbol_struct *keyword,
+				     struct othm_symbol_struct *relation,
 				     struct othm_idea *(*gen)(void))
 {
 	struct othm_idea *sub_idea;
 
-	sub_idea = othm_hashmap_get(idea->fields, OTHMREQUEST(keyword));
+	sub_idea = othm_hashmap_get(idea->fields, OTHMREQUEST(relation));
 	if (sub_idea != NULL) {
 		sub_idea = othm_idea_copy(sub_idea, gen);
 		sub_idea->context = NULL;
@@ -183,8 +185,8 @@ void othm_idea_free(struct othm_idea *idea,
 void othm_idea_extensiate(struct othm_idea *idea,
 			  struct othm_idea *(*gen)(void))
 {
-	othm_idea_new(gen, idea->symbol, NULL, idea);
-	idea->symbol = NULL;
+	othm_idea_new(gen, idea->name, NULL, idea);
+	idea->name = NULL;
 }
 
 void othm_idea_soup(struct othm_idea *context,
@@ -195,33 +197,74 @@ void othm_idea_soup(struct othm_idea *context,
 	struct othm_idea *transfer;
 	struct othm_idea *context_restrictium;
 
-	transfer = othm_idea_get_copy(ium, OTHM_KEYWORD(restrictium), gen);
-	context_restrictium = othm_idea_get(context, OTHM_KEYWORD(restrictium));
+	transfer = othm_idea_get_copy(ium, OTHM_SYMBOL(restrictium), gen);
+	if (transfer == NULL)
+		return;
+	context_restrictium = othm_idea_get(context, OTHM_SYMBOL(restrictium));
 	if (context_restrictium != NULL) {
 		othm_idea_merge_to(context_restrictium, transfer, destroy);
-		othm_idea_add(context, OTHM_KEYWORD(restrictium),
+		othm_idea_add(context, OTHM_SYMBOL(restrictium),
 			      context_restrictium);
 	} else {
-		othm_idea_add(context, OTHM_KEYWORD(restrictium), transfer);
+		othm_idea_add(context, OTHM_SYMBOL(restrictium), transfer);
 	}
 }
 
-void othm_idea_manifest(struct othm_idea *context,
-			struct othm_idea *host,
-			struct othm_idea *(*gen)(void))
+/* void othm_idea_manifest(struct othm_idea *context, */
+/* 			struct othm_idea *(*gen)(void)) */
+/* { */
+/* 	struct othm_idea *restrictium; */
+
+/* 	restrictium = othm_hashmap_get(context->fields, */
+/* 				       OTHMREQUEST */
+/* 				       (OTHM_SYMBOL(restrictium))); */
+/* 	OTHM_IDEA_FORALL */
+/* 		(restrictium, */
+/* 		 othm_idea_add(host, sub_idea->relation, */
+/* 			       othm_idea_get_copy(context, */
+/* 						  sub_idea->relation, */
+/* 						  gen))); */
+
+/* } */
+
+void othm_idea_mixup(struct othm_idea *context)
 {
-	struct othm_idea *restrictium;
-
-	restrictium = othm_hashmap_get(context->fields,
-				       OTHMREQUEST
-				       (OTHM_KEYWORD(restrictium)));
 	OTHM_IDEA_FORALL
-		(restrictium,
-		 othm_idea_add(host, sub_idea->keyword,
-			       othm_idea_get_copy(context,
-						  sub_idea->keyword,
-						  gen)));
+		(context,
+		 struct othm_idea *top_idea;
 
+		 top_idea = sub_idea;
+		 if (top_idea->relation == NULL) {
+			 OTHM_IDEA_FORALL
+				 (top_idea,
+				  if (sub_idea->relation == NULL)
+					  goto next;
+				  struct othm_idea *top_get;
+				  struct othm_idea *sub_get;
+
+				  top_get =
+				  othm_idea_get(context,
+						sub_idea->relation);
+				  if (top_get == NULL)
+					  goto next;
+				  /* current_hashentry =			\ */
+				  /* 	current_hashentry->next;	\ */
+				  /* othm_symbol_print(top_get->relation); */
+				  /* othm_symbol_print(top_get->name); */
+				  sub_get =
+				  othm_idea_get(top_idea,
+				  		sub_idea->relation);
+
+				  othm_idea_add(top_idea,
+				  		sub_idea->relation,
+				  		top_get);
+				  othm_idea_add(context,
+				  		sub_idea->relation,
+				  		sub_get);
+				 next:
+				  OTHM_SEMICOLON_INDUCER)
+				 }
+		 OTHM_SEMICOLON_INDUCER);
 }
 
 
@@ -231,16 +274,16 @@ void othm_idea_print_recursive(struct othm_idea *idea, int indent)
 	int inside_indent = indent + 4;
 
 	if (idea->fields->entries_num == 0) {
-		if (idea->symbol != NULL)
-			othm_symbol_print(idea->symbol);
+		if (idea->name != NULL)
+			othm_symbol_print(idea->name);
 		else
 			printf("...");
 		printf("\n");
 		return;
 	}
 	printf("[ ");
-	if (idea->symbol != NULL)
-		othm_symbol_print(idea->symbol);
+	if (idea->name != NULL)
+		othm_symbol_print(idea->name);
 	else
 		printf("...");
 	printf(" ] {\n");
@@ -249,8 +292,8 @@ void othm_idea_print_recursive(struct othm_idea *idea, int indent)
 		(idea,
 		 for (j = 0; j != inside_indent; ++j)
 			 printf(" ");
-		 if (sub_idea->keyword != NULL) {
-			 othm_symbol_print(sub_idea->keyword);
+		 if (sub_idea->relation != NULL) {
+			 othm_symbol_print(sub_idea->relation);
 			 printf(" = ");
 		 } else {
 			 printf("-> ");

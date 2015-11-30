@@ -16,6 +16,8 @@ OTHM_KEYWORD_INIT(body);
 OTHM_KEYWORD_INIT(being);
 
 OTHM_SYMBOL_INIT(dreadium);
+OTHM_SYMBOL_INIT(blue);
+OTHM_SYMBOL_INIT(red);
 
 /* OTHM_KEYWORD_INIT(thing); */
 /* OTHM_SYMBOL_INIT(abstract); */
@@ -26,9 +28,8 @@ OTHM_SYMBOL_INIT(dreadium);
 
 int main(int argc, char **args)
 {
-	/* struct othm_idea *truth = othm_idea_new(NULL, OTHM_SYMBOL(true), */
-	/* 					OTHM_SYMBOL(abstract)); */
-	struct othm_idea *Death = othm_idea_new(NULL, OTHM_SYMBOL(Death),
+	/* othm_symbol_print(OTHM_SYMBOL(restrictium)); */
+	struct othm_idea *Death = othm_idea_new(NULL, NULL,
 						NULL, NULL);
 
 	struct othm_idea *context = othm_idea_new(NULL, OTHM_SYMBOL(context),
@@ -39,7 +40,6 @@ int main(int argc, char **args)
 
 	struct othm_idea *black = othm_idea_new(NULL, OTHM_SYMBOL(black),
 						OTHM_KEYWORD(color), context);
-	/* othm_idea_add(black, OTHM_KEYWORD(abstract), truth); */
 	othm_idea_extensiate(black, NULL);
 
 	struct othm_idea *scythe = othm_idea_new(NULL, OTHM_SYMBOL(scythe),
@@ -47,16 +47,10 @@ int main(int argc, char **args)
 	struct othm_idea *reaper = othm_idea_new(NULL, OTHM_SYMBOL(reaper),
 						 OTHM_KEYWORD(body), context);
 
-	/* struct othm_idea *personium = othm_idea_new(NULL, NULL, NULL, context); */
-	/* othm_idea_new(NULL, OTHM_SYMBOL(reaper), OTHM_KEYWORD(body), personium); */
-
-
-	/* othm_idea_new(NULL, OTHM_SYMBOL(restrictium), NULL, context); */
-
 	struct othm_idea *dreadium = othm_idea_new(NULL, OTHM_SYMBOL(dreadium),
 						   NULL, NULL);
 	struct othm_idea *dreadium_restrict =
-		othm_idea_new(NULL, NULL, OTHM_KEYWORD(restrictium), dreadium);
+		othm_idea_new(NULL, NULL, OTHM_SYMBOL(restrictium), dreadium);
 	othm_idea_new(NULL, NULL, OTHM_KEYWORD(color), dreadium_restrict);
 	othm_idea_new(NULL, NULL, OTHM_KEYWORD(held), dreadium_restrict);
 	othm_idea_new(NULL, NULL, OTHM_KEYWORD(worn), dreadium_restrict);
@@ -65,22 +59,30 @@ int main(int argc, char **args)
 	othm_idea_soup(context, dreadium, NULL, NULL);
 	othm_idea_print_recursive(context, 0);
 
-	othm_idea_manifest(context, Death, NULL);
-	othm_idea_print_recursive(Death, 0);
-	/* othm_idea_print(Death); */
-	/* othm_idea_add(hood, OTHM_KEYWORD(color), black); */
-	/* othm_idea_add(Death, OTHM_KEYWORD(worn), hood); */
-	/* othm_idea_add(Death, OTHM_KEYWORD(held), scythe); */
-	/* othm_idea_add(Death, OTHM_KEYWORD(being), reaper); */
-	/* printf("Hello, world!"); */
+	/* othm_idea_manifest(context, Death, NULL); */
+	/* othm_idea_print_recursive(Death, 0); */
+
 	othm_idea_free(context, NULL);
 	othm_idea_free(dreadium, NULL);
 	othm_idea_free(Death, NULL);
-	/* othm_idea_free(reaper, NULL); */
-	/* othm_idea_free(scythe, NULL); */
+
+	/* struct othm_idea *hood = othm_idea_new(NULL, OTHM_SYMBOL(hood), */
+	/* 				       NULL, NULL); */
+	/* othm_idea_new(NULL, OTHM_SYMBOL(black), OTHM_KEYWORD(color), hood); */
+
+	/* struct othm_idea *assorted_colors2 = othm_idea_new(NULL, NULL, NULL, */
+	/* 						  hood); */
+	/* othm_idea_new(NULL, OTHM_SYMBOL(red), OTHM_KEYWORD(color), */
+	/* 	      assorted_colors2); */
+
+	/* struct othm_idea *assorted_colors = othm_idea_new(NULL, NULL, NULL, */
+	/* 						  hood); */
+	/* othm_idea_new(NULL, OTHM_SYMBOL(blue), OTHM_KEYWORD(color), */
+	/* 	      assorted_colors); */
+
+	/* othm_idea_mixup(hood); */
+	/* othm_idea_print_recursive(hood, 0); */
 	/* othm_idea_free(hood, NULL); */
-	/* othm_idea_free(black, NULL); */
-	/* othm_idea_free(truth, NULL); */
 
 	return 0;
 }
